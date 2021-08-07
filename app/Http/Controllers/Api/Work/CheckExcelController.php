@@ -19,6 +19,18 @@ class CheckExcelController extends Controller
     }
 
     /**
+     * 查看目前缓存订单明细
+     * @param Request $request
+     * @return string
+     */
+    public function checkAllExcel(Request $request) {
+        $result = $this->orderService->selectAllCacheOrderCount();
+        if (!$result) {
+            return msg(5, __LINE__);
+        }
+        return msg(0, $result);
+    }
+    /**
      * 查看订单明细
      * @param Request $request
      * @return array|string

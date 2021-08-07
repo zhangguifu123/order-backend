@@ -4,11 +4,34 @@ namespace App\Services;
 
 use App\Model\Association;
 use App\Model\Order;
+use App\Model\Work;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use \Redis;
 class OrdersService
 {
+    /**
+     * 通过订单号 修改订单
+     * @param $update_data
+     * @return bool|mixed
+     */
+    public function updateMysqlOrder($update_data) {
+        $check_params = array_column($update_data, 'order_number');
+        $model = new Order();
+        print_r($check_params);
+        $check = $model::query()->whereIn('order_number',$check_params)->get()->toArray();
+        if (empty($check)) {
+            return msg(7, __LINE__);
+        }
+        $result = $model->update($update_data);
+        if ($result) {
+            return $update_data;
+        } else {
+            return false;
+        }
+    }
+
+
     /**
      * 获取excel缓存订单
      * @param $data
@@ -28,7 +51,34 @@ class OrdersService
         }
     }
 
-
+    /**
+     * 查看redis订单
+     * @return array|bool
+     */
+    public function selectAllCacheOrderCount(){
+        try {
+            $redis = new Redis();
+            $redis->connect("order_redis", 6379);
+            $suppliers = $redis->hKeys('supplier');
+            $result = [];
+            foreach ($suppliers as $supplier) {
+                $files = $redis->hGetAll($supplier);
+                //获取文件数据
+                foreach ($files as $fileName => $data){
+                    $data = json_decode($data,true);
+                    //获取订单数量
+                    $count = count($data);
+                    $result[$supplier][$fileName] = $count;
+                }
+            };
+            if (empty($result) ){
+                return false;
+            }
+            return $result;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
     /**
      * 获取excel缓存订单
      * @param $data

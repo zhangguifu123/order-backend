@@ -20,8 +20,10 @@ Route::namespace('Api')->group(function (){
     Route::post('/login','Manager\LoginController@check');
     Route::group(['middleware' => 'auth:api'], function () {
         Route::get('/order/export','Work\DealExcelController@exportCacheExcel');
-        Route::post('/order/add',  'Work\DealExcelController@dealExcel');
+        Route::post('/order/add',  'Work\DealExcelController@dealExcel')->middleware('excel.check');
+        Route::post('/order/update',  'Work\DealExcelController@updateOrder');
 
+        Route::get('/order/check/all','Work\CheckExcelController@checkAllExcel');
         Route::post('/order/check','Work\CheckExcelController@checkExcel');
         Route::post('/order/check/reback','Work\CheckExcelController@checkExcelReback');
         Route::post('/order/del',  'Work\CheckExcelController@delExcel');

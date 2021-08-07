@@ -11,6 +11,7 @@ use App\Services\ExcelService;
 use App\Services\OrdersService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use PHPExcel_IOFactory;
 use \Redis;
 
@@ -26,6 +27,28 @@ class DealExcelController extends Controller
         $this->model = new OrdersService();
     }
 
+    /**
+     * @param Request $request
+     * @return string
+     * @throws \PHPExcel_Reader_Exception
+     */
+    public function updateOrder(Request $request) {
+        $excelService = new ExcelService();
+        //上传excel文件
+        $file = $request->file('file');
+        $excel = $excelService->readExcel($file);
+        if ($excel === 1) {
+            return msg(1, '数据解析失败');
+        }
+
+        //读取第一张表
+        $sheet  = $excel->getSheet(0);
+        $check  = $sheet->getCell("D1")->getValue();
+        if (!$check == '商品名称') {
+            return msg(7, __LINE__);
+        }
+        return $excelService->dealRebackExcel($excel);
+    }
 
     /**
      * 导出缓存excel
@@ -37,7 +60,7 @@ class DealExcelController extends Controller
             //将数据保存到数据库
             $model           = new Order();
             $stencil_model   = new Association();
-            $redis = new Redis();
+            $redis           = new Redis();
             $redis->connect("order_redis", 6379);
             $suppliers = $redis->hKeys('supplier');
             if (empty($suppliers)){
@@ -66,15 +89,13 @@ class DealExcelController extends Controller
                     }
                 }
                 //查找模版
-                try{
-                    $stencil = $stencil_model::query()->where('supplier',$supplier)->where('goods',$export_data[0]['goods'])->get(['stencil'])->toArray();
-                } catch (Exception $e) {
+                if (empty($export_data)){
                     return msg(5,__LINE__);
                 }
-
-
+                $stencil = $stencil_model::query()->where('supplier',$supplier)->where('goods',$export_data[0]['goods'])->get(['stencil'])->toArray();
                 //导出模版
-                $url = $model->chooseExcelExport($export_data, $stencil[0]['stencil'], $supplier);
+                $excelService = new ExcelService();
+                $url = $excelService->chooseExcelExport($export_data, $stencil[0]['stencil'], $supplier);
                 $files  = array_keys($files);
                 //创建推送任务
                 $data   = [
@@ -102,17 +123,14 @@ class DealExcelController extends Controller
         }
     }
 
-
-
-
     public function dealExcel(Request $request){
+        //上传excel文件
         $excelService = new ExcelService();
-        $deal = $excelService->readExcel($request);
-        if ($deal === 1) {
+        $file = $request->file('file');
+        $excel = $excelService->readExcel($file);
+        if ($excel === 1) {
             return msg(1, '数据解析失败');
         }
-        $excel  = $deal['excel'];
-        $file   = $deal['file'];
 
         //读取第一张表
         $sheet  = $excel->getSheet(0);
@@ -137,10 +155,14 @@ class DealExcelController extends Controller
         if (empty($import_data)) {
             return msg(1, '数据解析失败');
         }
-        $goods    = array_column($import_data,'goods');
-
-        $supplier = $this->model->getSupplier($goods[0]);
-        $result   = [$supplier => $fileName];
+        $goods      = array_column($import_data,'goods');
+        $orderCount = count($import_data);
+        $supplier   = $this->model->getSupplier($goods[0]);
+        $result     = [
+          'supplier'   => $supplier,
+          'fileName'   => $fileName,
+          'orderCount' => $orderCount,
+        ];
         return msg(0, $result);
     }
 

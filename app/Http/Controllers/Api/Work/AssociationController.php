@@ -20,11 +20,12 @@ class AssociationController extends Controller
     public function createAssociation(Request $request){
         //读取表
         $excelService = new ExcelService();
-        $deal = $excelService->readExcel($request);
-        if ($deal === 1) {
+        //上传excel文件
+        $file = $request->file('file');
+        $excel = $excelService->readExcel($file);
+        if ($excel === 1) {
             return msg(1, '数据解析失败');
         }
-        $excel  = $deal['excel'];
         //读取第一张表
         $sheet  = $excel->getSheet(0);
         $check  = $sheet->getCell("A1")->getValue();
@@ -34,7 +35,7 @@ class AssociationController extends Controller
             $import_data = []; //数组形式获取表格数据
             for ($i = 2; $i <= $highestRow; $i++) {
                 //一个供应商最多八列
-                for ($j = 'B'; $j != 'G';$j++) {
+                for ($j = 'B'; $j != 'H';$j++) {
                     if ($sheet->getCell($j . $i)->getValue() == null) {
                         continue;
                     }
