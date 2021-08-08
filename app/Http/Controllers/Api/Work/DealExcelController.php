@@ -194,6 +194,7 @@ class DealExcelController extends Controller
             $fileIds = $excelService->getFileidsByWork($workId, $work_model);
             $excelService->chooseOrderExcelExport($fileIds, $objExcel, $objWriter, $order_model);
         }
+        return msg(0, __LINE__);
     }
 
     private function _dealExcelStencil3($excel,$fileName) {
