@@ -18,19 +18,31 @@ class OrdersService
     public function updateMysqlOrder($update_data) {
         $check_params = array_column($update_data, 'order_number');
         $model = new Order();
-        print_r($check_params);
         $check = $model::query()->whereIn('order_number',$check_params)->get()->toArray();
         if (empty($check)) {
             return msg(7, __LINE__);
         }
-        $result = $model->update($update_data);
-        if ($result) {
-            return $update_data;
-        } else {
-            return false;
+        $lost_order = [];
+        foreach ($update_data as $data) {
+            $order = $model::query()->where('order_number',$data['order_number'])->where('goods', $data['goods'])->first();
+            //若查询不到 则抓出来
+            if (!$order){
+                $lost_order['wrong_order_number'][] = $data['order_number'];
+            } else {
+                $order->update($data);
+            }
         }
+        //返回商家自行查找
+        if (!empty($lost_order)) {
+            $lost_order['code'] = 400;
+            return $lost_order;
+        }
+        return $update_data;
     }
 
+    private function _updateWork(){
+
+    }
 
     /**
      * 获取excel缓存订单
