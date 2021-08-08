@@ -106,7 +106,7 @@ class DealExcelController extends Controller
                 $files  = array_keys($files);
                 //创建推送任务
                 $data   = [
-                    'id'           => $wordId,
+                    'work_id'      => $wordId,
                     'supplier'     => $supplier,
                     'files'        => json_encode($files),
                     'export_url'   => $url,

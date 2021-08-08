@@ -14,7 +14,7 @@ class CreateWorksTable extends Migration
     public function up()
     {
         Schema::create('works', function (Blueprint $table) {
-            $table->string('id')->default(0);
+            $table->string('work_id')->default(0);
             $table->string('status')->comment('状态')->default(1);
             $table->string('supplier')->comment('供应商')->default('错误数据');
             $table->json('files')->comment('文件名称');
