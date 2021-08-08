@@ -11,6 +11,7 @@ use App\Services\ExcelService;
 use App\Services\OrdersService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use PHPExcel_IOFactory;
 use \Redis;
@@ -33,6 +34,10 @@ class DealExcelController extends Controller
      * @throws \PHPExcel_Reader_Exception
      */
     public function updateOrder(Request $request) {
+        $supplier = $request->input('supplier');
+        if (empty($supplier) || !isset($supplier)) {
+            return msg(1, __LINE__);
+        }
         $excelService = new ExcelService();
         //上传excel文件
         $file = $request->file('file');
@@ -47,7 +52,7 @@ class DealExcelController extends Controller
         if (!$check == '商品名称') {
             return msg(7, __LINE__);
         }
-        return $excelService->dealRebackExcel($excel);
+        return $excelService->dealRebackExcel($excel,$supplier);
     }
 
     /**
@@ -76,7 +81,7 @@ class DealExcelController extends Controller
                 //获取订单数量
                 $count  = 0;
                 //获取文件数据
-                foreach ($files as $fileName => $import_data){
+                foreach ($files as $fileId => $import_data){
                     $import_data = json_decode($import_data,true);
                     $count += count($import_data);
                     //将workID插入
@@ -89,7 +94,7 @@ class DealExcelController extends Controller
                         return msg(6,$import_data);
                     }
                     //删除redis
-                    $redis->hdel($supplier,$fileName);
+                    $redis->hdel($supplier,$fileId);
                     //放入大数组
                     foreach ($import_data as $order) {
                         $export_data[] = $order;
@@ -148,27 +153,28 @@ class DealExcelController extends Controller
         switch ($check)
         {
             case '商品名称':
-                $import_data = $this->_dealExcelStencilOne($excel, $fileName);
+                $return_data = $this->_dealExcelStencil1($excel, $fileName);
                 break;
             case '商品信息':
-                $import_data = $this->_dealExcelStencilTwo($excel, $fileName);
+                $return_data = $this->_dealExcelStencil2($excel, $fileName);
                 break;
             case '收货地址':
-                $import_data = $this->_dealExcelStencilThree($excel, $fileName);
+                $return_data = $this->_dealExcelStencil3($excel, $fileName);
                 break;
             default:
                 return msg(3,'文件模版出错！');
         }
 
-        if (empty($import_data)) {
+        if (empty($return_data)) {
             return msg(1, '数据解析失败');
         }
-        $goods      = array_column($import_data,'goods');
-        $orderCount = count($import_data);
+        $goods      = array_column($return_data['import_data'],'goods');
+        $orderCount = count($return_data['import_data']);
         $supplier   = $this->model->getSupplier($goods[0]);
         $result     = [
           'supplier'   => $supplier,
           'fileName'   => $fileName,
+          'fileId'     => $return_data['fileId'],
           'orderCount' => $orderCount,
         ];
         return msg(0, $result);
@@ -178,7 +184,7 @@ class DealExcelController extends Controller
 
 
 
-    private function _dealExcelStencilThree($excel,$fileName) {
+    private function _dealExcelStencil3($excel,$fileName) {
         //读取第一张表
         $sheet = $excel->getSheet(0);
         //获取总行数
@@ -203,12 +209,18 @@ class DealExcelController extends Controller
             $import_data[$i]['goods']             = $sheet->getCell("H" . $i)->getValue();
             $import_data[$i]['count']             = $sheet->getCell("J" . $i)->getValue();
             $import_data[$i]['address']           = $sheet->getCell("G" . $i)->getValue();
+            $import_data[$i]['file_stencil_id']   = 3;
             $import_data[$i]['created_at']        = date('Y-m-d H:i:s');
             $import_data[$i]['updated_at']        = date('Y-m-d H:i:s');
         }
-        $result = $this->_cacheFile($fileName, $import_data, $supplier);
+        $result = $this->_cacheFile($fileId, $import_data, $supplier);
+        Log::notice('fileId:'.$fileId.'fileName'.$fileName);
         if ($result) {
-            return $import_data;
+            $return_result = [
+                'import_data' => $import_data,
+                'fileId'      => $fileId,
+            ];
+            return $return_result;
         } else {
             return false;
         }
@@ -220,16 +232,14 @@ class DealExcelController extends Controller
      * @return array
      * 第二种模版读取
      */
-    private function _dealExcelStencilTwo($excel,$fileName) {
+    private function _dealExcelStencil2($excel,$fileName) {
         //读取第一张表
         $sheet = $excel->getSheet(0);
         //获取总行数
         $row_num  = $sheet->getHighestRow();
         //获取供应商名称
         $check    = $sheet->getCell("G2")->getValue();
-        $model    = new Association();
-        $supplier = $model->query()->where('goods',$check)->get()->toArray();
-        $supplier = $supplier[0]['supplier'];
+        $supplier = $this->model->getSupplier($check);
         //生成文件Id
         $fileId  = $this->_createFileId();
         $import_data = []; //数组形式获取表格数据
@@ -246,13 +256,18 @@ class DealExcelController extends Controller
             $import_data[$i]['city']              = $sheet->getCell("L" . $i)->getValue();
             $import_data[$i]['area']              = $sheet->getCell("M" . $i)->getValue();
             $import_data[$i]['address']           = $sheet->getCell("F" . $i)->getValue();
+            $import_data[$i]['file_stencil_id']   = 2;
             $import_data[$i]['created_at']        = date('Y-m-d H:i:s');
             $import_data[$i]['updated_at']        = date('Y-m-d H:i:s');
         }
 
-        $result = $this->_cacheFile($fileName, $import_data, $supplier);
+        $result = $this->_cacheFile($fileId, $import_data, $supplier);
         if ($result) {
-            return $import_data;
+            $return_result = [
+                'import_data' => $import_data,
+                'fileId'      => $fileId,
+            ];
+            return $return_result;
         } else {
             return false;
         }
@@ -260,19 +275,18 @@ class DealExcelController extends Controller
 
     /**
      * @param $excel
+     * @param $fileName
      * @return array
      * 第一种模版读取
      */
-    private function _dealExcelStencilOne($excel,$fileName){
+    private function _dealExcelStencil1($excel,$fileName){
         //读取第一张表
         $sheet = $excel->getSheet(0);
         //获取总行数
         $rowColumn = $sheet->getHighestRow();
         //获取供应商名称
         $check    = $sheet->getCell("G2")->getValue();
-        $model    = new Association();
-        $supplier = $model->query()->where('goods',$check)->get()->toArray();
-        $supplier = $supplier[0]['supplier'];
+        $supplier = $this->model->getSupplier($check);
         //生成文件Id
         $fileId  = $this->_createFileId();
         $import_data = []; //数组形式获取表格数据
@@ -290,13 +304,18 @@ class DealExcelController extends Controller
             $import_data[$i]['area']              = $sheet->getCell("L" . $i)->getValue();
             $import_data[$i]['address']           = $sheet->getCell("M" . $i)->getValue();
             $import_data[$i]['remarks']           = $sheet->getCell("N" . $i)->getValue();
+            $import_data[$i]['file_stencil_id']   = 1;
             $import_data[$i]['created_at']        = date('Y-m-d H:i:s');
             $import_data[$i]['updated_at']        = date('Y-m-d H:i:s');
         }
 
-        $result = $this->_cacheFile($fileName, $import_data, $supplier);
+        $result = $this->_cacheFile($fileId, $import_data, $supplier);
         if ($result) {
-            return $import_data;
+            $return_result = [
+                'import_data' => $import_data,
+                'fileId'      => $fileId,
+            ];
+            return $return_result;
         } else {
             return false;
         }
@@ -348,23 +367,23 @@ class DealExcelController extends Controller
 
     /**
      * redis添加缓存
-     * @param $fileName
+     * @param $fileId
      * @param $import_data
      * @param $supplier
      * @return bool
      */
-    private function _cacheFile($fileName,$import_data,$supplier) {
+    private function _cacheFile($fileId,$import_data,$supplier) {
         try {
             $redis = new Redis();
             $redis->connect("order_redis", 6379);
-            if (empty($fileName) || empty($import_data)){
+            if (empty($fileId) || empty($import_data)){
                 return false;
             }
             $count       = count($import_data);
             $import_data = json_encode($import_data);
-            $redis->hSet($supplier, $fileName, $import_data);
+            $redis->hSet($supplier, $fileId, $import_data);
             $redis->hSet('supplier',$supplier, 1);
-            return $count;
+            return $fileId;
         } catch (Exception $e) {
             return false;
             die();

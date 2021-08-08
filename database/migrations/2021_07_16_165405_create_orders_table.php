@@ -16,10 +16,11 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('file_name')->comment('文件名称');
+            $table->string('file_stencil_id')->comment('文件模版id')->default(0);
             $table->string('file_id')->comment('文件id');
             $table->string('work_id')->comment('推送任务id');
             $table->string('order_number')->comment('订单编号');
-            $table->string('logistics_number')->comment('物流单号')->default('空');
+            $table->string('logistics_number')->comment('物流单号')->default(null);
             $table->string('solitaire_number')->comment('接龙号');
             $table->string('goods')->comment('商品名称');
             $table->string('count')->comment('商品数量');

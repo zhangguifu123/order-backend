@@ -10,9 +10,10 @@ class ExcelService
 {
     /**
      * @param $excel
+     * @param $supplier
      * @return string
      */
-    public function dealRebackExcel($excel) {
+    public function dealRebackExcel($excel, $supplier) {
         //读取第一张表
         $sheet = $excel->getSheet(0);
         //获取总行数
@@ -26,6 +27,7 @@ class ExcelService
         }
         $orderService = new OrdersService();
         $result = $orderService->updateMysqlOrder($update_data);
+        $orderService->pushRedisWork($supplier);
         if (isset($result['code']) && $result['code'] == 400) {
             return msg(9, $result);
         } else {

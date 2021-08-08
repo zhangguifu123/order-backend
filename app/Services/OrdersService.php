@@ -40,9 +40,16 @@ class OrdersService
         return $update_data;
     }
 
-    private function _updateWork(){
-
+    public function pushRedisWork($supplier){
+        try {
+            $redis  = new Redis();
+            $redis->connect("order_redis", 6379);
+            $redis->rPush('work',$supplier);
+        } catch (Exception $e) {
+            return false;
+        }
     }
+
 
     /**
      * 获取excel缓存订单
@@ -53,7 +60,7 @@ class OrdersService
         try {
             $model  = new Order();
             $result = $model::query()
-                ->where('file_name',$data['fileName'])
+                ->where('file_name',$data['fileId'])
                 ->whereNotIn('logistics_number',['空'])
                 ->count();
 
@@ -76,11 +83,11 @@ class OrdersService
             foreach ($suppliers as $supplier) {
                 $files = $redis->hGetAll($supplier);
                 //获取文件数据
-                foreach ($files as $fileName => $data){
+                foreach ($files as $fileId => $data){
                     $data = json_decode($data,true);
                     //获取订单数量
                     $count = count($data);
-                    $result[$supplier][$fileName] = $count;
+                    $result[$supplier][$fileId] = $count;
                 }
             };
             if (empty($result) ){
@@ -100,7 +107,7 @@ class OrdersService
         try {
             $redis  = new Redis();
             $redis->connect("order_redis", 6379);
-            $result = $redis->hGet($data['supplier'],$data['fileName']);
+            $result = $redis->hGet($data['supplier'],$data['fileId']);
             if (empty($result) ){
                 return false;
             }
@@ -119,7 +126,7 @@ class OrdersService
         try {
             $redis  = new Redis();
             $redis->connect("order_redis", 6379);
-            $result = $redis->hDel($data['supplier'],$data['fileName']);
+            $result = $redis->hDel($data['supplier'],$data['fileId']);
             $check  = $redis->hGetAll($data['supplier']);
             if (empty($check)) {
                 $redis->hDel('supplier', $data['supplier']);
@@ -136,7 +143,7 @@ class OrdersService
         //声明理想数据格式
         $mod = [
             "supplier"   => ["string", "max:400"],
-            "fileName"   => ["string", "max:400"],
+            "fileId"   => ["string", "max:400"],
         ];
         //是否缺失参数
         if (!$request->has(array_keys($mod))){
