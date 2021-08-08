@@ -10,9 +10,8 @@ use App\Model\Work;
 use App\Services\ExcelService;
 use App\Services\OrdersService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+use PHPExcel;
 use PHPExcel_IOFactory;
 use \Redis;
 
@@ -81,7 +80,7 @@ class DealExcelController extends Controller
                 //获取订单数量
                 $count  = 0;
                 //获取文件数据
-                foreach ($files as $fileId => $import_data){
+                foreach ($files as $fileName => $import_data){
                     $import_data = json_decode($import_data,true);
                     $count += count($import_data);
                     //将workID插入
@@ -94,7 +93,7 @@ class DealExcelController extends Controller
                         return msg(6,$import_data);
                     }
                     //删除redis
-                    $redis->hdel($supplier,$fileId);
+                    $redis->hdel($supplier,$fileName);
                     //放入大数组
                     foreach ($import_data as $order) {
                         $export_data[] = $order;
@@ -181,8 +180,21 @@ class DealExcelController extends Controller
     }
 
 
-
-
+    public function exportBuyerExcel (Request $request) {
+        $workIds = $request->route('workIds');
+        if (empty($workIds)) {
+            return msg(1, __LINE__);
+        }
+        $excelService = new ExcelService();
+        $work_model   = new Work();
+        $order_model  = new Order();
+        $objExcel     = new PHPExcel();
+        $objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel5');
+        foreach ($workIds as $workId) {
+            $fileIds = $excelService->getFileidsByWork($workId, $work_model);
+            $excelService->chooseOrderExcelExport($fileIds, $objExcel, $objWriter, $order_model);
+        }
+    }
 
     private function _dealExcelStencil3($excel,$fileName) {
         //读取第一张表
@@ -213,7 +225,7 @@ class DealExcelController extends Controller
             $import_data[$i]['created_at']        = date('Y-m-d H:i:s');
             $import_data[$i]['updated_at']        = date('Y-m-d H:i:s');
         }
-        $result = $this->_cacheFile($fileId, $import_data, $supplier);
+        $result = $this->_cacheFile($fileName, $import_data, $supplier);
         Log::notice('fileId:'.$fileId.'fileName'.$fileName);
         if ($result) {
             $return_result = [
@@ -261,7 +273,7 @@ class DealExcelController extends Controller
             $import_data[$i]['updated_at']        = date('Y-m-d H:i:s');
         }
 
-        $result = $this->_cacheFile($fileId, $import_data, $supplier);
+        $result = $this->_cacheFile($fileName, $import_data, $supplier);
         if ($result) {
             $return_result = [
                 'import_data' => $import_data,
@@ -309,7 +321,7 @@ class DealExcelController extends Controller
             $import_data[$i]['updated_at']        = date('Y-m-d H:i:s');
         }
 
-        $result = $this->_cacheFile($fileId, $import_data, $supplier);
+        $result = $this->_cacheFile($fileName, $import_data, $supplier);
         if ($result) {
             $return_result = [
                 'import_data' => $import_data,
@@ -372,18 +384,18 @@ class DealExcelController extends Controller
      * @param $supplier
      * @return bool
      */
-    private function _cacheFile($fileId,$import_data,$supplier) {
+    private function _cacheFile($fileName,$import_data,$supplier) {
         try {
             $redis = new Redis();
             $redis->connect("order_redis", 6379);
-            if (empty($fileId) || empty($import_data)){
+            if (empty($fileName) || empty($import_data)){
                 return false;
             }
             $count       = count($import_data);
             $import_data = json_encode($import_data);
-            $redis->hSet($supplier, $fileId, $import_data);
+            $redis->hSet($supplier, $fileName, $import_data);
             $redis->hSet('supplier',$supplier, 1);
-            return $fileId;
+            return $fileName;
         } catch (Exception $e) {
             return false;
             die();
