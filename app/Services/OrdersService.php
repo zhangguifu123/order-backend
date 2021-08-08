@@ -61,7 +61,7 @@ class OrdersService
             $model  = new Order();
             $result = $model::query()
                 ->where('file_name',$data['fileId'])
-                ->whereNotIn('logistics_number',['空'])
+                ->where('logistics_number','!=',0)
                 ->count();
 
             return $result;

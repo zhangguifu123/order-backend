@@ -49,13 +49,12 @@ class WorkInfo extends Command
             }
             $model       = new Work();
             $order_model = new Order();
-            $workIds   = $model::query()->where('supplier', $supplier)->where('status', 1)->get('word_id')->toArray();
-            $workIds   = array_column($workIds);
-            Log::notice('params:'.$workIds);
+            $workIds   = $model::query()->where('supplier', $supplier)->where('status', 1)->get('work_id')->toArray();
+            $workIds   = array_column($workIds, 'work_id');
             foreach ($workIds as $workId) {
-                $reback = $order_model::query()->where('work_id', $workId)->whereNotNull('logistics_number')->count();
+                $reback = $order_model::query()->where('work_id', $workId)->where('logistics_number','!=',0)->count();
                 if ($reback != 0){
-                    $model::query()->where('work_id',$workId)->first()->update(['reback_count' => $reback]);
+                     $result = $model::query()->where('work_id',$workId)->first()->update(['reback_count' => $reback]);
                 }
             }
         } catch (Exception $e) {

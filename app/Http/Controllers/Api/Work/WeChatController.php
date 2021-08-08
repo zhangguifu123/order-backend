@@ -17,9 +17,8 @@ class WeChatController extends Controller
         $offset = $request->route("page") * $limit - $limit;
 
         $result = $work_model::query()->limit(10)
-            ->offset($offset)->orderByDesc("evaluations.created_at")
-            ->orderByDesc("evaluations.top")
+            ->offset($offset)->orderByDesc("created_at")
             ->get()->toArray();
-        return $result;
+        return msg(0, $result);
     }
 }
