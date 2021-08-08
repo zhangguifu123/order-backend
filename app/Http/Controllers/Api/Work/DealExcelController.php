@@ -69,13 +69,20 @@ class DealExcelController extends Controller
             //获取 供应商
             foreach ($suppliers as $supplier) {
                 $export_data = [];
-                $files = $redis->hGetAll($supplier);
+                $files  = $redis->hGetAll($supplier);
+                //创建workID
+                $wordId = $this->_createWorkId();
+                $work   = ['work_id' => $wordId];
                 //获取订单数量
-                $count = 0;
+                $count  = 0;
                 //获取文件数据
                 foreach ($files as $fileName => $import_data){
                     $import_data = json_decode($import_data,true);
                     $count += count($import_data);
+                    //将workID插入
+                    array_walk($import_data, function (&$value, $key, $work) {
+                        $value = array_merge($value, $work);
+                    }, $work);
                     //插入mysql
                     $result = $model::insert($import_data);
                     if (!$result){
@@ -99,6 +106,7 @@ class DealExcelController extends Controller
                 $files  = array_keys($files);
                 //创建推送任务
                 $data   = [
+                    'id'           => $wordId,
                     'supplier'     => $supplier,
                     'files'        => json_encode($files),
                     'export_url'   => $url,
@@ -309,6 +317,28 @@ class DealExcelController extends Controller
                 $redis->incr('fileId');
             }
             $fileId = $redis->get('fileId');
+            return $fileId;
+        } catch (Exception $e) {
+            return false;
+            die();
+        }
+    }
+
+    /**
+     * @return bool|mixed|string
+     * 生成文件id
+     */
+    private function _createWorkId(){
+        //redis添加文件id
+        try {
+            $redis = new Redis();
+            $redis->connect("order_redis", 6379);
+            if (!$redis->get('workId')){
+                $redis->set('workId' , 1);
+            }else{
+                $redis->incr('workId');
+            }
+            $fileId = $redis->get('workId');
             return $fileId;
         } catch (Exception $e) {
             return false;
