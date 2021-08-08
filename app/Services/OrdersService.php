@@ -117,6 +117,25 @@ class OrdersService
         }
     }
 
+    public function delAllCacheOrder() {
+        try {
+            $redis  = new Redis();
+            $redis->connect("order_redis", 6379);
+            $suppliers = $redis->hKeys('supplier');
+            if (!empty($suppliers)) {
+                foreach ($suppliers as $supplier){
+                    $redis->hDel($supplier);
+                }
+                $redis->hDel('supplier');
+            } else {
+                return false;
+            }
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
     /**
      * 删除excel缓存订单
      * @param $data

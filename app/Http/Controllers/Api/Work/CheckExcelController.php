@@ -83,4 +83,17 @@ class CheckExcelController extends Controller
         }
         return msg(0 ,$result);
     }
+
+    /**
+     * 删除所有excel上传数据
+     * @param Request $request
+     * @return array|string
+     */
+    public function delAllExcel(Request $request){
+        $result = $this->orderService->delAllCacheOrder();
+        if (!$result){
+            return msg(5 , __LINE__ );
+        }
+        return msg(0 ,$result);
+    }
 }

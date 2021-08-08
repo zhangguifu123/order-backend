@@ -28,6 +28,9 @@ Route::namespace('Api')->group(function (){
         Route::post('/order/check','Work\CheckExcelController@checkExcel');
         Route::post('/order/check/reback','Work\CheckExcelController@checkExcelReback');
         Route::post('/order/del',  'Work\CheckExcelController@delExcel');
+        Route::post('/order/del/all',  'Work\CheckExcelController@delAllExcel');
+
+
 
         Route::get('/work/{page}','Work\WeChatController@selectWork');
         Route::post('/reback','Work\DealExcelController@updateOrder');
