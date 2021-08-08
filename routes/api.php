@@ -28,6 +28,8 @@ Route::namespace('Api')->group(function (){
         Route::post('/order/check/reback','Work\CheckExcelController@checkExcelReback');
         Route::post('/order/del',  'Work\CheckExcelController@delExcel');
 
+        Route::get('/work/{page}','Work\WeChatController@selectWork');
+        Route::post('/reback','Work\DealExcelController@updateOrder');
         Route::post('/association/add','Work\AssociationController@createAssociation');
         Route::get('/association','Work\AssociationController@getAssociation');
 
