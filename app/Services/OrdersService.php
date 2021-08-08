@@ -124,9 +124,14 @@ class OrdersService
             $suppliers = $redis->hKeys('supplier');
             if (!empty($suppliers)) {
                 foreach ($suppliers as $supplier){
-                    $redis->hDel($supplier);
+                    $files = $redis->hGetAll($supplier);
+                    foreach ($files as $fileName => $file) {
+                        //删除redis
+                        $redis->hdel($supplier,$fileName);
+                    }
+                    $redis->hDel('supplier', $supplier);
                 }
-                $redis->hDel('supplier');
+                return true;
             } else {
                 return false;
             }
