@@ -22,13 +22,14 @@ class ExcelService
             $update_data[$i]['logistics']        = $sheet->getCell("A" . $i)->getValue();
             $update_data[$i]['logistics_number'] = $sheet->getCell("B" . $i)->getValue();
             $update_data[$i]['order_number']     = $sheet->getCell("C" . $i)->getValue();
+            $update_data[$i]['goods']            = $sheet->getCell("D" . $i)->getValue();
         }
         $orderService = new OrdersService();
         $result = $orderService->updateMysqlOrder($update_data);
-        if ($result) {
-            return msg(0, $result);
+        if (isset($result['code']) && $result['code'] == 400) {
+            return msg(9, $result);
         } else {
-            return msg(7, __LINE__);
+            return msg(0, $result);
         }
     }
 
