@@ -17,7 +17,7 @@ class CreateWorksTable extends Migration
             $table->string('id')->default(0);
             $table->string('status')->comment('状态')->default(1);
             $table->string('supplier')->comment('供应商')->default('错误数据');
-            $table->json('files')->comment('文件名称')->default('错误数据');
+            $table->json('files')->comment('文件名称');
             $table->string('export_url')->comment('导出模版链接')->default('错误数据');
             $table->string('order_count')->comment('订单数')->default('错误数据');
             $table->string('reback_count')->comment('回执单数')->default('错误数据');
