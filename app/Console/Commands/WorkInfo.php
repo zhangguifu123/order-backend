@@ -49,12 +49,13 @@ class WorkInfo extends Command
             }
             $model       = new Work();
             $order_model = new Order();
-            $workIds   = $model::query()->where('supplier', $supplier)->where('status', 1)->get('work_id')->toArray();
-            $workIds   = array_column($workIds, 'work_id');
-            foreach ($workIds as $workId) {
-                $reback = $order_model::query()->where('work_id', $workId)->where('logistics_number','!=',0)->count();
-                if ($reback != 0){
-                     $result = $model::query()->where('work_id',$workId)->first()->update(['reback_count' => $reback]);
+            $works   = $model::query()->where('supplier', $supplier)->where('status','!=', 2)->get(['work_id','order_count'])->toArray();
+            foreach ($works as $work) {
+                $reback = $order_model::query()->where('work_id', $work['work_id'])->where('logistics_number','!=',0)->count();
+                if ($reback != 0 && $reback < $work['order_count']){
+                    $result = $model::query()->where('work_id',$work['work_id'])->first()->update(['reback_count' => $reback,'status' => 1]);
+                } elseif ($reback !=0 && $reback == $work['order_count']){
+                    $result = $model::query()->where('work_id',$work['work_id'])->first()->update(['reback_count' => $reback,'status' => 2]);
                 }
             }
         } catch (Exception $e) {

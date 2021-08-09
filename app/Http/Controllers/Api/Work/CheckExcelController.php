@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Work;
 
 use App\Http\Controllers\Controller;
 use App\Services\OrdersService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class CheckExcelController extends Controller
@@ -18,6 +19,9 @@ class CheckExcelController extends Controller
         $this->orderService = new OrdersService();
     }
 
+    public function search(Request $request) {
+
+    }
     /**
      * 查看目前缓存订单明细
      * @param Request $request

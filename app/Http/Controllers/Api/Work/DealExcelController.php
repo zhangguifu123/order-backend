@@ -115,7 +115,7 @@ class DealExcelController extends Controller
                     'files'        => json_encode($files),
                     'export_url'   => $url,
                     'order_count'  => $count,
-                    'status'       => 1,
+                    'status'       => 0,
                     'reback_count' => 0,
                 ];
                 $work_model = new Work($data);
