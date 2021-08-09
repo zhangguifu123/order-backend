@@ -181,7 +181,7 @@ class DealExcelController extends Controller
 
 
     public function exportBuyerExcel (Request $request) {
-        $workIds = $request->route('workIds');
+        $workIds = $request->input('workIds');
         if (empty($workIds)) {
             return msg(1, __LINE__);
         }
@@ -192,6 +192,7 @@ class DealExcelController extends Controller
         $objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel5');
         foreach ($workIds as $workId) {
             $fileIds = $excelService->getFileidsByWork($workId, $work_model);
+	    $fileIds = json_decode($fileIds['files']);
             $excelService->chooseOrderExcelExport($fileIds, $objExcel, $objWriter, $order_model);
         }
         return msg(0, __LINE__);

@@ -10,7 +10,7 @@ use PHPExcel_IOFactory;
 class ExcelService
 {
     public function getFileidsByWork($workId,Work $model) {
-        return $model::query()->where('work_id', $workId)->first();
+        return $model::query()->where('work_id', $workId)->first(['files'])->toArray();
     }
 
     public function chooseOrderExcelExport($fileIds, $objExcel, $objWriter,Order $order_model) {
