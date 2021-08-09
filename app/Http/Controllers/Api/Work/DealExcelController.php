@@ -103,11 +103,17 @@ class DealExcelController extends Controller
                 if (empty($export_data)){
                     return msg(5,__LINE__);
                 }
-                $stencil = $stencil_model::query()->where('supplier',$supplier)->where('goods',$export_data[0]['goods'])->get(['stencil'])->toArray();
+                $stencil      = $stencil_model::query()->where('supplier',$supplier)->where('goods',$export_data[0]['goods'])->get(['stencil'])->toArray();
                 //导出模版
                 $excelService = new ExcelService();
-                $url = $excelService->chooseExcelExport($export_data, $stencil[0]['stencil'], $supplier);
-                $files  = array_keys($files);
+                $url          = $excelService->chooseExcelExport($export_data, $stencil[0]['stencil'], $supplier);
+                $files        = array_keys($files);
+                $newFiles     = [];
+                foreach ($files as $file) {
+                    $str = $file;
+                    preg_match('/\d+/', $str, $matches);
+                    $newFiles[] = $matches[1];
+                }
                 //创建推送任务
                 $data   = [
                     'work_id'      => $wordId,
