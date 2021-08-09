@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Work;
 
 use App\Http\Controllers\Controller;
-use App\Model\Order;
+use App\Model\Work;
 use App\Services\OrdersService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -21,8 +21,7 @@ class CheckExcelController extends Controller
     }
 
     public function search(Request $request) {
-        $model = new Order();
-        $count = $model::query()->count();
+        $model = new Work();
         if (isset($request['start_date']) && isset($request['end_date'])) {
             $model = $model::query()->where('created_at','>',Carbon::parse($request->start_date))
                         ->where('created_at','<',Carbon::parse($request->end_date));
@@ -34,6 +33,7 @@ class CheckExcelController extends Controller
         } else {
             $model = $model::query();
         }
+	$count = $model->count();
         //分页，每页10条
         $limit  = 10;
         $offset = $request->route("page") * $limit - $limit;
