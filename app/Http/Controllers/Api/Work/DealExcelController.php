@@ -227,7 +227,7 @@ class DealExcelController extends Controller
             $import_data[$i]['created_at']        = date('Y-m-d H:i:s');
             $import_data[$i]['updated_at']        = date('Y-m-d H:i:s');
         }
-        $result = $this->_cacheFile($fileName, $import_data, $supplier);
+        $result = $this->_cacheFile($fileId, $fileName, $import_data, $supplier);
         Log::notice('fileId:'.$fileId.'fileName'.$fileName);
         if ($result) {
             $return_result = [
@@ -275,7 +275,7 @@ class DealExcelController extends Controller
             $import_data[$i]['updated_at']        = date('Y-m-d H:i:s');
         }
 
-        $result = $this->_cacheFile($fileName, $import_data, $supplier);
+        $result = $this->_cacheFile($fileId, $fileName, $import_data, $supplier);
         if ($result) {
             $return_result = [
                 'import_data' => $import_data,
@@ -323,7 +323,7 @@ class DealExcelController extends Controller
             $import_data[$i]['updated_at']        = date('Y-m-d H:i:s');
         }
 
-        $result = $this->_cacheFile($fileName, $import_data, $supplier);
+        $result = $this->_cacheFile($fileId, $fileName, $import_data, $supplier);
         if ($result) {
             $return_result = [
                 'import_data' => $import_data,
@@ -382,21 +382,21 @@ class DealExcelController extends Controller
     /**
      * redis添加缓存
      * @param $fileId
+     * @param $fileName
      * @param $import_data
      * @param $supplier
      * @return bool
      */
-    private function _cacheFile($fileName,$import_data,$supplier) {
+    private function _cacheFile($fileId, $fileName,$import_data,$supplier) {
         try {
             $redis = new Redis();
             $redis->connect("order_redis", 6379);
             if (empty($fileName) || empty($import_data)){
                 return false;
             }
-            $count       = count($import_data);
             $import_data = json_encode($import_data);
             $redis->hSet($supplier, $fileName, $import_data);
-            $redis->hSet('supplier',$supplier, 1);
+            $redis->hSet('supplier',"[".$fileId."]".$supplier, 1);
             return $fileName;
         } catch (Exception $e) {
             return false;
