@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Route;
 Route::namespace('Api')->group(function (){
     Route::post('/login','Manager\LoginController@check');
     Route::group(['middleware' => 'auth:api'], function () {
+        Route::post('/logout','Manager\LoginController@update');
+
         Route::get('/order/export','Work\DealExcelController@exportCacheExcel');
         Route::post('/file/export',  'Work\DealExcelController@exportBuyerExcel');
         Route::post('/order/add',  'Work\DealExcelController@dealExcel')->middleware('excel.check');

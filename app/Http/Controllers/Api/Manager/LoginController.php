@@ -25,7 +25,7 @@ class LoginController extends Controller
             'api_token' => hash('sha256', $token),
         ])->save();
 
-        return ['token' => $token];
+        return msg(0, __LINE__);
     }
     /**
      * 在有效注册之后创建一个新用户实例：
@@ -58,6 +58,9 @@ class LoginController extends Controller
             return msg(1,__LINE__);
         }
     }
+
+
+
 
 
     private function _dataHandle(Request $request){
