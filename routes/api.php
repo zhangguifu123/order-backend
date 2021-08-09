@@ -24,7 +24,7 @@ Route::namespace('Api')->group(function (){
         Route::post('/order/add',  'Work\DealExcelController@dealExcel')->middleware('excel.check');
         Route::post('/order/update',  'Work\DealExcelController@updateOrder');
 
-	Route::get('/order/search',  'Work\CheckExcelController@search');
+	    Route::get('/order/search',  'Work\WeChatController@search');
         Route::get('/order/check/all','Work\CheckExcelController@checkAllExcel');
         Route::post('/order/check','Work\CheckExcelController@checkExcel');
         Route::post('/order/check/reback','Work\CheckExcelController@checkExcelReback');
