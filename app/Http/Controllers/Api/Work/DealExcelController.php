@@ -397,12 +397,13 @@ class DealExcelController extends Controller
         try {
             $redis = new Redis();
             $redis->connect("order_redis", 6379);
-            if (empty($fileName) || empty($import_data)){
+            if (empty($fileId) || empty($fileName) || empty($import_data)){
                 return false;
             }
             $import_data = json_encode($import_data);
-            $redis->hSet($supplier, $fileName, $import_data);
-            $redis->hSet('supplier',"[".$fileId."]".$supplier, 1);
+            $fileIdName = "[".$fileId."]".$supplier;
+            $redis->hSet($supplier, $fileIdName, $import_data);
+            $redis->hSet('supplier',$supplier, 1);
             return $fileName;
         } catch (Exception $e) {
             return false;
