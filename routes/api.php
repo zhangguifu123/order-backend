@@ -35,6 +35,7 @@ Route::namespace('Api')->group(function (){
 
 
 
+        Route::get('/work/repeat','Work\WeChatController@repeatWork');
         Route::get('/work/{page}','Work\WeChatController@selectWork');
         Route::post('/reback','Work\DealExcelController@updateOrder');
         Route::post('/association/add','Work\AssociationController@createAssociation');

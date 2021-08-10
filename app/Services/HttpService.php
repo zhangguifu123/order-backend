@@ -8,7 +8,7 @@ use GuzzleHttp\Client;
 class HttpService
 {
 
-    //测试
+    //推送WeChat
     function pushWeChat($url, $data_string) {
 	sleep(1);
         $ch = curl_init();
