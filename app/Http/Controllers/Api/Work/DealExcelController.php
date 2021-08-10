@@ -112,13 +112,13 @@ class DealExcelController extends Controller
                 foreach ($files as $file) {
                     $str = $file;
                     preg_match('/\d+/', $str, $matches);
-                    $newFiles[] = $matches[1];
+                    $newFiles[] = $matches[0];
                 }
                 //创建推送任务
                 $data   = [
                     'work_id'      => $wordId,
                     'supplier'     => $supplier,
-                    'files'        => json_encode($files),
+                    'files'        => json_encode($newFiles),
                     'export_url'   => $url,
                     'order_count'  => $count,
                     'status'       => 0,
@@ -401,7 +401,7 @@ class DealExcelController extends Controller
                 return false;
             }
             $import_data = json_encode($import_data);
-            $fileIdName = "[".$fileId."]".$supplier;
+            $fileIdName = "[".$fileId."]".$fileName;
             $redis->hSet($supplier, $fileIdName, $import_data);
             $redis->hSet('supplier',$supplier, 1);
             return $fileName;

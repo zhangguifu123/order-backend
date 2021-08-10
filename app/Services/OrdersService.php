@@ -107,7 +107,7 @@ class OrdersService
         try {
             $redis  = new Redis();
             $redis->connect("order_redis", 6379);
-            $result = $redis->hGet($data['supplier'],$data['fileId']);
+            $result = $redis->hGet($data['supplier'],$data['fileIdName']);
             if (empty($result) ){
                 return false;
             }
@@ -150,7 +150,7 @@ class OrdersService
         try {
             $redis  = new Redis();
             $redis->connect("order_redis", 6379);
-            $result = $redis->hDel($data['supplier'],$data['fileId']);
+            $result = $redis->hDel($data['supplier'],$data['fileIdName']);
             $check  = $redis->hGetAll($data['supplier']);
             if (empty($check)) {
                 $redis->hDel('supplier', $data['supplier']);
@@ -166,8 +166,8 @@ class OrdersService
     public function dataHandle(Request $request){
         //声明理想数据格式
         $mod = [
-            "supplier"   => ["string", "max:400"],
-            "fileId"   => ["string", "max:400"],
+            "supplier"     => ["string", "max:400"],
+            "fileIdName"   => ["string", "max:400"],
         ];
         //是否缺失参数
         if (!$request->has(array_keys($mod))){
