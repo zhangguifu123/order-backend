@@ -109,7 +109,7 @@ class DealExcelController extends Controller
                 //导出模版
                 $excelService = new ExcelService();
                 $url          = $excelService->chooseExcelExport($export_data, $stencil[0]['stencil'], $supplier);
-                $wxId         = $stencil[0]['stencil'];
+                $wxId         = $stencil[0]['wx_id'];
                 $files        = array_keys($files);
                 $newFiles     = [];
                 foreach ($files as $file) {
@@ -119,7 +119,8 @@ class DealExcelController extends Controller
                 }
                 $pushUrl          = '47.94.130.183:8085/sendTextMsg';
                 $pushToWeChatData = ['wxid' => $wxId, 'content' => '今日订单：'.$url, ];
-                $result = $http_model->pushWeChat($pushUrl, json_encode($pushToWeChatData));
+		$result = $http_model->pushWeChat($pushUrl, json_encode($pushToWeChatData));
+		$result = json_decode($result, true);
                 if ($result['code'] !== 200) {
                     return msg(11, $result);
                 }
