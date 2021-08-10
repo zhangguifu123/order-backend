@@ -48,7 +48,7 @@ class DealExcelController extends Controller
         //读取第一张表
         $sheet  = $excel->getSheet(0);
         $check  = $sheet->getCell("D1")->getValue();
-        if (!$check == '商品名称') {
+        if ($check !== '商品名称') {
             return msg(7, __LINE__);
         }
         return $excelService->dealRebackExcel($excel,$supplier);
