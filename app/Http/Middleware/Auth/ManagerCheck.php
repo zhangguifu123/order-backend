@@ -16,8 +16,8 @@ class ManagerCheck
     public function handle($request, Closure $next)
     {
         $isManager = $request->input('isManager');
-        if ($isManager !== 1) {
-            return msg(12, __LINE__);
+        if ($isManager != 1) {
+            return response(msg(12, __LINE__));
         }
         return $next($request);
     }

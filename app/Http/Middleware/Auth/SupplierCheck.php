@@ -17,7 +17,7 @@ class SupplierCheck
     {
         $supplier = $request->input('supplier');
         if (!isset($supplier) || empty($supplier)) {
-            return msg(12, __LINE__);
+            return response(msg(12, __LINE__));
         }
         return $next($request);
     }
