@@ -59,6 +59,10 @@ class LoginController extends Controller
         }
     }
 
+    public function info(Request $request){
+        $user  = $request->user();
+        return msg(0, $user);
+    }
 
 
 

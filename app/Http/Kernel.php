@@ -63,6 +63,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'excel.check' => \App\Http\Middleware\Excel\CheckExcelsCheck ::class,
+        'manager.check' => \App\Http\Middleware\Auth\ManagerCheck ::class,
+        'supplier.check' => \App\Http\Middleware\Auth\SupplierCheck ::class,
     ];
 
     /**
