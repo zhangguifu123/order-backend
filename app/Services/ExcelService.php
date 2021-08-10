@@ -172,9 +172,11 @@ class ExcelService
         $orderService->pushRedisWork($supplier);
         if (isset($result['code']) && $result['code'] == 400) {
             return msg(9, $result);
-        } else {
-            return msg(0, $result);
         }
+        if ($result === 10) {
+            return msg(10, __LINE__);
+        }
+        return msg(0, $result);
     }
 
     /**

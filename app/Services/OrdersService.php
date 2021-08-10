@@ -20,7 +20,7 @@ class OrdersService
         $model = new Order();
         $check = $model::query()->whereIn('order_number',$check_params)->get()->toArray();
         if (empty($check)) {
-            return msg(7, __LINE__);
+            return 10;
         }
         $lost_order = [];
         foreach ($update_data as $data) {
