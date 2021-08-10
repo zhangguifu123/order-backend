@@ -22,10 +22,11 @@ class WeChatController extends Controller
         $work_model    = new Work();
         $http_model    = new HttpService();
         foreach ($workIds as $workId ) {
-            $workData = $work_model::query()->where('work_id',$workId)->get(['export_url','wx_id'])->toArray();
+            $work_model = $work_model::query()->where('work_id',$workId);
+            $workData   = $work_model->get(['export_url','wx_id'])->toArray();
             if (empty($workData)) {
                 $returnWorkIds['badWorkId'] = $workId;
-                return msg(12, $returnWorkIds);
+                return msg(11, $returnWorkIds);
             }
             $wxId     = $workData[0]['wx_id'];
             $url      = $workData[0]['export_url'];
@@ -38,6 +39,7 @@ class WeChatController extends Controller
                 $returnWorkIds['badWorkId'] = $workId;
                 return msg(8, $returnWorkIds);
             }
+            $work_model->update(['wx_status' => 1]);
             $returnWorkIds['okWorkIds'][] = $workId;
         }
         return msg(0, $returnWorkIds);

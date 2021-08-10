@@ -176,7 +176,7 @@ class ExcelService
         if ($result === 10) {
             return msg(10, __LINE__);
         }
-        return msg(0, $result);
+        return msg(0, __LINE__);
     }
 
     /**

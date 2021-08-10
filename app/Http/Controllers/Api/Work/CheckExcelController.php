@@ -50,7 +50,7 @@ class CheckExcelController extends Controller
     }
 
     /**
-     * 查看回单信息
+     * 查看回单信息 已废弃
      * @param Request $request
      * @return array|string
      */

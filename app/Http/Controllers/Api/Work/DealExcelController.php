@@ -121,9 +121,6 @@ class DealExcelController extends Controller
                 $pushToWeChatData = ['wxid' => $wxId, 'content' => '今日订单：'.$url, ];
                 $result = $http_model->pushWeChat($pushUrl, json_encode($pushToWeChatData));
                 $result = json_decode($result, true);
-                if ($result['code'] !== 200) {
-                    return msg(11, $result);
-                }
                 //创建推送任务
                 $data   = [
                     'work_id'      => $wordId,
@@ -135,9 +132,17 @@ class DealExcelController extends Controller
                     'status'       => 0,
                     'reback_count' => 0,
                 ];
+                if ($result['code'] !== 200) {
+                    $data['wx_status'] = 0;
+                    $work_model = new Work($data);
+                    $result = $work_model->save();
+                    return msg(11, $result);
+                }
 
+                $data['wx_status'] = 1;
                 $work_model = new Work($data);
                 $result = $work_model->save();
+
                 if (!$result){
                     return msg(6,$data);
                 }
