@@ -31,7 +31,7 @@ class WeChatController extends Controller
             $url      = $workData[0]['export_url'];
             $pushUrl          = '47.94.130.183:8085/sendTextMsg';
             $pushToWeChatData = ['wxid' => $wxId, 'content' => '今日订单：'.$url, ];
-            Log::notice('微信推送参数：'.$pushToWeChatData);
+            //Log::notice('微信推送参数：'.$pushToWeChatData,[]);
             $result = $http_model->pushWeChat($pushUrl, json_encode($pushToWeChatData));
             $result = json_decode($result, true);
             if ($result['code'] !== 200) {
