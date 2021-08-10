@@ -8,6 +8,7 @@ use App\Model\Association;
 use App\Model\Order;
 use App\Model\Work;
 use App\Services\ExcelService;
+use App\Services\HttpService;
 use App\Services\OrdersService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -65,6 +66,7 @@ class DealExcelController extends Controller
             $model           = new Order();
             $stencil_model   = new Association();
             $redis           = new Redis();
+            $http_model      = new HttpService();
             $redis->connect("order_redis", 6379);
             $suppliers = $redis->hKeys('supplier');
             if (empty($suppliers)){
@@ -103,10 +105,11 @@ class DealExcelController extends Controller
                 if (empty($export_data)){
                     return msg(5,__LINE__);
                 }
-                $stencil      = $stencil_model::query()->where('supplier',$supplier)->where('goods',$export_data[0]['goods'])->get(['stencil'])->toArray();
+                $stencil      = $stencil_model::query()->where('supplier',$supplier)->where('goods',$export_data[0]['goods'])->get(['stencil','wx_id'])->toArray();
                 //导出模版
                 $excelService = new ExcelService();
                 $url          = $excelService->chooseExcelExport($export_data, $stencil[0]['stencil'], $supplier);
+                $wxId         = $stencil[0]['stencil'];
                 $files        = array_keys($files);
                 $newFiles     = [];
                 foreach ($files as $file) {
@@ -117,6 +120,7 @@ class DealExcelController extends Controller
                 //创建推送任务
                 $data   = [
                     'work_id'      => $wordId,
+                    'wx_id'        => $wxId,
                     'supplier'     => $supplier,
                     'files'        => json_encode($newFiles),
                     'export_url'   => $url,
@@ -124,6 +128,9 @@ class DealExcelController extends Controller
                     'status'       => 0,
                     'reback_count' => 0,
                 ];
+                $pushUrl          = '47.94.130.183:8085/sendTextMsg';
+                $pushToWeChatData = ['wx_id' => $wxId, 'content' => '今日订单：'.$url, ];
+                $http_model->pushWeChat($pushUrl, json_encode($pushToWeChatData));
                 $work_model = new Work($data);
                 $result = $work_model->save();
                 if (!$result){

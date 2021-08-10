@@ -8,31 +8,21 @@ use GuzzleHttp\Client;
 class HttpService
 {
 
-//测试
-    public function pushWcChat(Request $request){
-        $client = new Client([
-            // Base URI is used with relative requests
-            'base_uri' => 'https://www.baidu.com',
-            // You can set any number of default request options.
-            'timeout'  => 2.0,
-        ]);
-        $response = $client->request('POST', 'http://httpbin.org/post', [
-            'form_params' => [
-                'field_name' => 'abc',
-                'other_field' => '123',
-                'nested_field' => [
-                    'nested' => 'hello'
-                ]
-            ]
-        ]);
-        $response     = Htt::get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx95aba4fd9b40e13d&secret=bcd16232a8be911b8bfdabf4fbf77e5c');
-        $responseData = json_decode($response->body(),true);
-        $accessToken  =  $responseData['access_token'];
-        $response     = Http::post('https://api.weixin.qq.com/wxa/img_sec_check?access_token='.$accessToken, [
-            'media' => $request->file('image'),
-        ]);
+    //测试
+    function pushWeChat($url, $data_string) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-        return $response->body();
-
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'X-AjaxPro-Method:ShowList',
+                'Content-Type: application/json; charset=utf-8',
+                'Content-Length: ' . strlen($data_string))
+        );
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+        $data = curl_exec($ch);
+        curl_close($ch);
+        return $data;
     }
 }

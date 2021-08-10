@@ -16,7 +16,8 @@
         "maatwebsite/excel": "^3.1",
         "phpoffice/phpexcel": "^1.8",
         "ext-redis": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-curl": "*"
     },
     "require-dev": {
         "facade/ignition": "^1.4",
