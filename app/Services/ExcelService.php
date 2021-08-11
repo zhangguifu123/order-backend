@@ -243,6 +243,11 @@ class ExcelService
             $fileName = $fileName . ".xls";
             header("Content-Disposition: attachment;filename=$fileName");
             header('Cache-Control: max-age=0');
+            header('Access-Control-Allow-Origin', '*');
+            header('Access-Control-Allow-Headers', 'Origin, Content-Type, Cookie, X-CSRF-TOKEN, Accept, Authorization, X-XSRF-TOKEN');
+            header('Access-Control-Expose-Headers', '*');
+            header('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, OPTIONS');
+            header('Access-Control-Allow-Credentials', 'true');
             $objWriter->save('php://output');
         }
         return $url;

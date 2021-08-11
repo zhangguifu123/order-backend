@@ -12,7 +12,21 @@ use Illuminate\Support\Facades\Log;
 
 class WeChatController extends Controller
 {
-    //
+    public function getFileOrderByWorkId(Request $request) {
+        if (empty($request['workId'])) {
+            return msg(1, __LINE__);
+        }
+        $workId      = $request['workId'];
+        $work_model  = new Work();
+        $work_model  = $work_model::query()->where('work_id',$workId)->first();
+        $files       = $work_model->files;
+        $order_model = new Order();
+//        $data
+    }
+    /**
+     * @param Request $request
+     * @return string
+     */
     public function repeatWork(Request $request){
         if (empty($request['workIds'])) {
             return msg(1, __LINE__);
