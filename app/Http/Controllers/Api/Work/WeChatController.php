@@ -12,16 +12,39 @@ use Illuminate\Support\Facades\Log;
 
 class WeChatController extends Controller
 {
+    /**
+     * @param Request $request
+     * @return string
+     */
     public function getFileOrderByWorkId(Request $request) {
-        if (empty($request['workId'])) {
+        if (empty($request['files'])) {
             return msg(1, __LINE__);
         }
-        $workId      = $request['workId'];
-        $work_model  = new Work();
-        $work_model  = $work_model::query()->where('work_id',$workId)->first();
-        $files       = $work_model->files;
         $order_model = new Order();
-//        $data
+        $filesData   = [];
+        $files       =  $request['files'];
+        foreach ($files as $fileId) {
+            $order_model  = $order_model::query()->where('file_id', $fileId);
+            $fileName     = $order_model->get('file_name')->toArray();
+            $fileName     = $fileName[0]['file_name'];
+            $allCount     = $order_model->count();
+            $backCount    = $order_model->where('logistics_number','!=',0) ->count();
+            if ($backCount === 0) {
+                $status = 0;
+            }  elseif ($backCount === $allCount) {
+                $status = 1;
+            }  elseif ($backCount > 0 && $backCount < $allCount) {
+                $status = 2;
+            }
+            $fileData = [
+                'fileName'  => $fileName,
+                'allCount'  => $allCount,
+                'backCount' => $backCount,
+                'status'    => $status,
+            ];
+            $filesData[] = $fileData;
+        }
+        return msg(0, $filesData);
     }
     /**
      * @param Request $request

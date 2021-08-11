@@ -48,6 +48,8 @@ Route::namespace('Api')->group(function (){
             Route::get('/work/{page}','Work\WeChatController@selectWork');
             //管理员检索
             Route::get('/work/search',  'Work\WeChatController@search');
+            //获取work下面的回单数量
+            Route::get('/work/file','Work\WeChatController@getFileOrderByWorkId');
         });
 
         //供应商回单
