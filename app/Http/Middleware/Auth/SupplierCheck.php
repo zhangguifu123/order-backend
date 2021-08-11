@@ -15,10 +15,13 @@ class SupplierCheck
      */
     public function handle($request, Closure $next)
     {
-        $supplier = $request->input('supplier');
-        if (!isset($supplier) || empty($supplier)) {
-            return response(msg(12, __LINE__));
+        $isManager      = $request->header('Authorization');
+        $Authorization  = substr($isManager, 7);
+        $supplier       = $this->model::query()->where('api_token', $Authorization)->first()->supplier;
+        if (isset($supplier) && !empty($supplier)){
+            $request['supplier'] = $supplier;
+            return $next($request);
         }
-        return $next($request);
+        return msg(13, __LINE__);
     }
 }

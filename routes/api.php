@@ -23,7 +23,7 @@ Route::namespace('Api')->group(function (){
         Route::post('/logout','Manager\LoginController@update');
         Route::get('/info','Manager\LoginController@info');
 
-//        Route::group(['middleware' => 'manager.check'], function () {
+        Route::group(['middleware' => 'manager.check'], function () {
             //发布推送任务
             Route::get('/order/export','Work\DealExcelController@exportCacheExcel');
             //导出团长订单
@@ -48,7 +48,7 @@ Route::namespace('Api')->group(function (){
             Route::get('/work/{page}','Work\WeChatController@selectWork');
             //管理员检索
             Route::get('/work/search',  'Work\WeChatController@search');
-//        });
+        });
 
         //供应商回单
         Route::post('/order/update',  'Work\DealExcelController@updateOrder');
