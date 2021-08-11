@@ -23,11 +23,12 @@ Route::namespace('Api')->group(function (){
         Route::post('/logout','Manager\LoginController@update');
         Route::get('/info','Manager\LoginController@info');
 
+        //导出团长订单
+        Route::post('/file/export',  'Work\DealExcelController@exportBuyerExcel');
         Route::group(['middleware' => 'manager.check'], function () {
             //发布推送任务
             Route::get('/order/export','Work\DealExcelController@exportCacheExcel');
-            //导出团长订单
-            Route::post('/file/export',  'Work\DealExcelController@exportBuyerExcel');
+
             //添加团长订单
             Route::post('/order/add',  'Work\DealExcelController@dealExcel')->middleware('excel.check');
             //查看团长订单缓存列表
