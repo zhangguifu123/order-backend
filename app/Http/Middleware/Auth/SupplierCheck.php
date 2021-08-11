@@ -2,10 +2,20 @@
 
 namespace App\Http\Middleware\Auth;
 
+use App\User;
 use Closure;
 
 class SupplierCheck
 {
+    /**
+     * @var User
+     */
+    private $model;
+
+    public function __construct()
+    {
+        $this->model = new User();
+    }
     /**
      * Handle an incoming request.
      *
