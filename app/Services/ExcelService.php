@@ -13,14 +13,12 @@ class ExcelService
         return $model::query()->where('work_id', $workId)->first(['files'])->toArray();
     }
 
-    public function chooseOrderExcelExport($fileIds, $objExcel, $objWriter,Order $order_model) {
-        foreach ($fileIds as $fileId) {
-            $export_data = $order_model::query()->where('file_id', $fileId)->get()->toArray();
-            $stencil  = array_column($export_data, 'file_stencil_id');
-            $stencil  = $stencil[0];
-            $function = '_buyerExcelExport'.$stencil;
-            $this->$function($export_data, $objExcel, $objWriter);
-        }
+    public function chooseOrderExcelExport($fileId, $objExcel, $objWriter,Order $order_model) {
+        $export_data = $order_model::query()->where('file_id', $fileId)->get()->toArray();
+        $stencil  = array_column($export_data, 'file_stencil_id');
+        $stencil  = $stencil[0];
+        $function = '_buyerExcelExport'.$stencil;
+        $this->$function($export_data, $objExcel, $objWriter);
     }
 
     private function _buyerExcelExport3($export_data, $objExcel, $objWriter) {

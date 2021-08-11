@@ -204,7 +204,8 @@ class DealExcelController extends Controller
 
 
     public function exportBuyerExcel (Request $request) {
-        $workIds = $request->input('workIds');
+        $workId = $request->input('workId');
+        $fileId = $request->input('fileId');
         if (empty($workIds)) {
             return msg(1, __LINE__);
         }
@@ -213,11 +214,15 @@ class DealExcelController extends Controller
         $order_model  = new Order();
         $objExcel     = new PHPExcel();
         $objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel5');
-        foreach ($workIds as $workId) {
-            $fileIds = $excelService->getFileidsByWork($workId, $work_model);
+        $fileIds = $excelService->getFileidsByWork($workId, $work_model);
 	    $fileIds = json_decode($fileIds['files']);
-            $excelService->chooseOrderExcelExport($fileIds, $objExcel, $objWriter, $order_model);
-        }
+	    if (in_array($fileId, $fileIds)) {
+            $excelService->chooseOrderExcelExport($fileId, $objExcel, $objWriter, $order_model);
+        } else {
+	        $return = $request->all();
+	        return msg(14, $return);
+        };
+
         return msg(0, __LINE__);
     }
 
