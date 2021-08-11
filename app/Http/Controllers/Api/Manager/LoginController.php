@@ -69,7 +69,7 @@ class LoginController extends Controller
 
     private function _dataHandle(Request $request){
         $mod = array(
-            'phone'   => ['regex:/^1[\s]{8,13}$/'],
+            'phone'    => ['regex:/^[^\s]{8,20}$/'],
             'password' => ['regex:/^[^\s]{8,20}$/'],
         );
         if (!$request->has(array_keys($mod))) {

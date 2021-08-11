@@ -187,8 +187,8 @@ class DealExcelController extends Controller
                 return msg(3,'文件模版出错！');
         }
 
-        if (empty($return_data)) {
-            return msg(1, '数据解析失败');
+        if (!is_array($return_data)) {
+            return msg($return_data, '数据解析失败');
         }
         $order_model  = new Order();
         $goods        = array_column($return_data['import_data'],'goods');
@@ -433,7 +433,7 @@ class DealExcelController extends Controller
             $redis->connect("order_redis", 6379);
             $files     = $redis->hGetAll($supplier);
             foreach ($files as $file) {
-                $fileData          = json_decode($file);
+                $fileData          = json_decode($file, true);
                 $checkOrderNumbers = array_column($fileData, 'order_number');
                 $check             = array_intersect($orderNumbers, $checkOrderNumbers);
                 if (empty($check)) {

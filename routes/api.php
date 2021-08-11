@@ -47,9 +47,9 @@ Route::namespace('Api')->group(function (){
             //拉取推送任务列表
             Route::get('/work/{page}','Work\WeChatController@selectWork');
             //管理员检索
-            Route::get('/work/search',  'Work\WeChatController@searchWork');
+            Route::get('/work/search/{page}',  'Work\WeChatController@searchWork');
             //获取work下面的回单数量
-            Route::get('/work/file','Work\WeChatController@getFileOrderByWorkId');
+            Route::post('/work/file','Work\WeChatController@getFileOrderByWorkId');
         });
 
         //供应商回单

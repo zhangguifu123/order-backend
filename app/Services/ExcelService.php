@@ -240,7 +240,7 @@ class ExcelService
             $url = config("app.url")."/storage/buyer/".$fileName;
         } else {
             $url = true;
-            $fileName = $fileName . ".xls";
+	    $fileName = urlencode($fileName);
             header("Content-Disposition: attachment;filename=$fileName");
             header('Cache-Control: max-age=0');
             header('Access-Control-Allow-Origin: *');

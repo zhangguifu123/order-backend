@@ -17,18 +17,18 @@ class WeChatController extends Controller
      * @return string
      */
     public function getFileOrderByWorkId(Request $request) {
-        if (empty($request->route('files'))) {
+        if (empty($request->input('files'))) {
             return msg(1, __LINE__);
         }
         $order_model = new Order();
         $filesData   = [];
-        $files       =  $request->route('files');
+        $files       =  $request->input('files');
         foreach ($files as $fileId) {
-            $order_model  = $order_model::query()->where('file_id', $fileId);
-            $fileName     = $order_model->get('file_name')->toArray();
+            $now_order_model  = $order_model::query()->where('file_id', $fileId);
+            $fileName     = $now_order_model->get('file_name')->toArray();
             $fileName     = $fileName[0]['file_name'];
-            $allCount     = $order_model->count();
-            $backCount    = $order_model->where('logistics_number','!=',0) ->count();
+            $allCount     = $now_order_model->count();
+            $backCount    = $now_order_model->where('logistics_number','!=',0) ->count();
             if ($backCount === 0) {
                 $status = 0;
             }  elseif ($backCount === $allCount) {
