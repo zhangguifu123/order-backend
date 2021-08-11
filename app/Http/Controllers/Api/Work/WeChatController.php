@@ -130,7 +130,7 @@ class WeChatController extends Controller
      * @param Request $request
      * @return string
      */
-    public function search(Request $request) {
+    public function searchWork(Request $request) {
         $model = new Work();
         if (isset($request['start_date']) && isset($request['end_date'])) {
             $model = $model::query()->where('created_at','>',Carbon::parse($request->start_date))
