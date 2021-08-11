@@ -143,6 +143,10 @@ class WeChatController extends Controller
         } else {
             $model = $model::query();
         }
+
+        if (isset($request['wx_status'])) {
+            $model->where('wx_status', $request['wx_status']);
+        }
         $count = $model->count();
         //分页，每页10条
         $limit  = 10;
