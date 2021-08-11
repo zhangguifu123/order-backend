@@ -39,7 +39,7 @@ Route::namespace('Api')->group(function (){
             //清空缓存订单
             Route::post('/order/del/all',  'Work\CheckExcelController@delAllExcel');
             //重新执行微信推送
-            Route::get('/work/repeat','Work\WeChatController@repeatWork');
+            Route::post('/work/repeat','Work\WeChatController@repeatWork');
             //更新供货表
             Route::post('/association/add','Work\AssociationController@createAssociation');
             //获取供应商关系
