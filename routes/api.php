@@ -56,7 +56,7 @@ Route::namespace('Api')->group(function (){
             //供应商检索
             Route::get('/work/supplier/search',  'Work\WeChatController@supplierSearch');
             //拉取推送任务列表
-            Route::get('/work/supplier/{page}','Work\WeChatController@selectWork');
+            Route::get('/work/supplier/{page}','Work\WeChatController@selectSupplierWork');
         });
 
 
