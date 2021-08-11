@@ -190,13 +190,7 @@ class DealExcelController extends Controller
         if (!is_array($return_data)) {
             return msg($return_data, '数据解析失败');
         }
-        $order_model  = new Order();
         $goods        = array_column($return_data['import_data'],'goods');
-        $orderNumbers = array_column($return_data['import_data'],'order_number');
-        $check        = $order_model::query()->whereIn('order_number',$orderNumbers)->count();
-        if (!empty($check)) {
-            return msg(15, __LINE__);
-        }
         $orderCount = count($return_data['import_data']);
         $supplier   = $this->model->getSupplier($goods[0]);
         $result     = [
@@ -428,6 +422,11 @@ class DealExcelController extends Controller
     }
 
     private function _checkFile($orderNumbers, $supplier) {
+        $order_model  = new Order();
+        $check        = $order_model::query()->whereIn('order_number',$orderNumbers)->count();
+        if (!empty($check)) {
+            return false;
+        }
         try {
             $redis = new Redis();
             $redis->connect("order_redis", 6379);
