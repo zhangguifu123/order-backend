@@ -190,7 +190,13 @@ class DealExcelController extends Controller
         if (empty($return_data)) {
             return msg(1, '数据解析失败');
         }
-        $goods      = array_column($return_data['import_data'],'goods');
+        $order_model  = new Order();
+        $goods        = array_column($return_data['import_data'],'goods');
+        $orderNumbers = array_column($return_data['import_data'],'order_number');
+        $check        = $order_model::query()->whereIn('order_number',$orderNumbers)->count();
+        if (!empty($check)) {
+            return msg(15, __LINE__);
+        }
         $orderCount = count($return_data['import_data']);
         $supplier   = $this->model->getSupplier($goods[0]);
         $result     = [
