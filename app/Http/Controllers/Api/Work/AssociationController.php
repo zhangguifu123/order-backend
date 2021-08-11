@@ -42,6 +42,7 @@ class AssociationController extends Controller
                     $import_data[$j.$i]['supplier']    = $sheet->getCell('A' . $i)->getValue();
                     $import_data[$j.$i]['goods']       = $sheet->getCell($j . $i)->getValue();
                     $import_data[$j.$i]['stencil']     = $sheet->getCell('I' . $i)->getValue();
+                    $import_data[$j.$i]['wx_id']       = $sheet->getCell('J' . $i)->getValue();
                     $import_data[$j.$i]['created_at']  = date('Y-m-d H:i:s');
                     $import_data[$j.$i]['updated_at']  = date('Y-m-d H:i:s');
                 }
