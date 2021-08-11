@@ -206,7 +206,7 @@ class DealExcelController extends Controller
     public function exportBuyerExcel (Request $request) {
         $workId = $request->input('workId');
         $fileId = $request->input('fileId');
-        if (empty($workIds)) {
+        if (empty($workId) || empty($fileId)) {
             return msg(1, __LINE__);
         }
         $excelService = new ExcelService();
