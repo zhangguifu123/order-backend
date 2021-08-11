@@ -32,9 +32,9 @@ class WeChatController extends Controller
             if ($backCount === 0) {
                 $status = 0;
             }  elseif ($backCount === $allCount) {
-                $status = 1;
-            }  elseif ($backCount > 0 && $backCount < $allCount) {
                 $status = 2;
+            }  elseif ($backCount > 0 && $backCount < $allCount) {
+                $status = 1;
             }
             $fileData = [
                 'fileName'  => $fileName,
