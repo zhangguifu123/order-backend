@@ -241,7 +241,7 @@ class DealExcelController extends Controller
         $check    = $sheet->getCell("H2")->getValue();
         $supplier = $this->model->getSupplier($check);
         if (!$supplier){
-            return null;
+            return 13;
         }
         //生成文件Id
         $fileId  = $this->_createFileId();
@@ -261,17 +261,19 @@ class DealExcelController extends Controller
             $import_data[$i]['created_at']        = date('Y-m-d H:i:s');
             $import_data[$i]['updated_at']        = date('Y-m-d H:i:s');
         }
-        $result = $this->_cacheFile($fileId, $fileName, $import_data, $supplier);
-        Log::notice('fileId:'.$fileId.'fileName'.$fileName);
-        if ($result) {
-            $return_result = [
-                'import_data' => $import_data,
-                'fileId'      => $fileId,
-            ];
-            return $return_result;
-        } else {
-            return false;
+        //检查redis是否存在
+        $orderNumbers = array_column($import_data, 'order_number');
+        $check  = $this->_checkFile($orderNumbers, $supplier);
+        if (!$check) {
+            return 15;
         }
+        $this->_cacheFile($fileId, $fileName, $import_data, $supplier);
+        Log::notice('fileId:'.$fileId.'fileName'.$fileName);
+        $return_result = [
+            'import_data' => $import_data,
+            'fileId'      => $fileId,
+        ];
+        return $return_result;
     }
 
     /**
@@ -288,6 +290,9 @@ class DealExcelController extends Controller
         //获取供应商名称
         $check    = $sheet->getCell("G2")->getValue();
         $supplier = $this->model->getSupplier($check);
+        if (!$supplier){
+            return 13;
+        }
         //生成文件Id
         $fileId  = $this->_createFileId();
         $import_data = []; //数组形式获取表格数据
@@ -309,16 +314,19 @@ class DealExcelController extends Controller
             $import_data[$i]['updated_at']        = date('Y-m-d H:i:s');
         }
 
-        $result = $this->_cacheFile($fileId, $fileName, $import_data, $supplier);
-        if ($result) {
-            $return_result = [
-                'import_data' => $import_data,
-                'fileId'      => $fileId,
-            ];
-            return $return_result;
-        } else {
-            return false;
+        //检查redis是否存在
+        $orderNumbers = array_column($import_data, 'order_number');
+        $check  = $this->_checkFile($orderNumbers, $supplier);
+        if (!$check) {
+            return 15;
         }
+        $this->_cacheFile($fileId, $fileName, $import_data, $supplier);
+        Log::notice('fileId:'.$fileId.'fileName'.$fileName);
+        $return_result = [
+            'import_data' => $import_data,
+            'fileId'      => $fileId,
+        ];
+        return $return_result;
     }
 
     /**
@@ -335,6 +343,9 @@ class DealExcelController extends Controller
         //获取供应商名称
         $check    = $sheet->getCell("G2")->getValue();
         $supplier = $this->model->getSupplier($check);
+        if (!$supplier){
+            return 13;
+        }
         //生成文件Id
         $fileId  = $this->_createFileId();
         $import_data = []; //数组形式获取表格数据
@@ -357,16 +368,19 @@ class DealExcelController extends Controller
             $import_data[$i]['updated_at']        = date('Y-m-d H:i:s');
         }
 
-        $result = $this->_cacheFile($fileId, $fileName, $import_data, $supplier);
-        if ($result) {
-            $return_result = [
-                'import_data' => $import_data,
-                'fileId'      => $fileId,
-            ];
-            return $return_result;
-        } else {
-            return false;
+        //检查redis是否存在
+        $orderNumbers = array_column($import_data, 'order_number');
+        $check  = $this->_checkFile($orderNumbers, $supplier);
+        if (!$check) {
+            return 15;
         }
+        $this->_cacheFile($fileId, $fileName, $import_data, $supplier);
+        Log::notice('fileId:'.$fileId.'fileName'.$fileName);
+        $return_result = [
+            'import_data' => $import_data,
+            'fileId'      => $fileId,
+        ];
+        return $return_result;
     }
 
     /**
@@ -407,6 +421,28 @@ class DealExcelController extends Controller
             }
             $fileId = $redis->get('workId');
             return $fileId;
+        } catch (Exception $e) {
+            return false;
+            die();
+        }
+    }
+
+    private function _checkFile($orderNumbers, $supplier) {
+        try {
+            $redis = new Redis();
+            $redis->connect("order_redis", 6379);
+            $files     = $redis->hGetAll($supplier);
+            foreach ($files as $file) {
+                $fileData          = json_decode($file);
+                $checkOrderNumbers = array_column($fileData, 'order_number');
+                $check             = array_intersect($orderNumbers, $checkOrderNumbers);
+                if (empty($check)) {
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+            return true;
         } catch (Exception $e) {
             return false;
             die();
