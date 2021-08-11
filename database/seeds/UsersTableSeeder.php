@@ -15,6 +15,7 @@ class UsersTableSeeder extends Seeder
         //
         DB::table('users')->insert(
 	    [
+	        [
                 'phone'    => 'zhongjie',
                 'password' => Hash::make('zhongjie'),
                 'supplier' => '顾总',
@@ -28,20 +29,20 @@ class UsersTableSeeder extends Seeder
                 'status'   => 2,
                 'api_token' => Str::random(60),
             ],
-   	    [
+   	        [
                 'phone'    => 'huangtiane',
                 'password' => Hash::make('huangtiane'),
                 'supplier' => '黄天鹅对接群',
                 'status'   => 2,
                 'api_token' => Str::random(60),
             ],
-	    [
+	        [
                 'phone'    => '16630603363',
                 'password' => Hash::make('Sky31666'),
                 'status'   => 1,
                 'supplier' => '123',
                 'api_token' => Str::random(60),
             ],
-        );
+        ]);
     }
 }
