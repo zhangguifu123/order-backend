@@ -38,6 +38,7 @@ class WeChatController extends Controller
             }
             $fileData = [
                 'fileName'  => $fileName,
+                'fileId'    => $fileId,
                 'allCount'  => $allCount,
                 'backCount' => $backCount,
                 'status'    => $status,
