@@ -339,26 +339,41 @@ class ExcelService
     private function _supplierExcelExport3($export_data, $supplier, $objExcel, $objWriter) {
         $objActSheet = $objExcel->getActiveSheet(0);
         $objActSheet->setTitle('尊乐发货总表'); //设置excel的标题
-        $objActSheet->setCellValue('A1', '原始单号');
-        $objActSheet->setCellValue('B1', '收件人');
-        $objActSheet->setCellValue('C1', '手机');
-        $objActSheet->setCellValue('D1', '地址');
-        $objActSheet->setCellValue('E1', '数量');
-        $objActSheet->setCellValue('F1', '备注');
-        $objActSheet->setCellValue('G1', '商品名称');
+        $objActSheet->setCellValue('A1', '店铺名称');
+        $objActSheet->setCellValue('B1', '原始单号');
+        $objActSheet->setCellValue('C1', '收件人');
+        $objActSheet->setCellValue('D1', '手机');
+        $objActSheet->setCellValue('E1', '固话');
+        $objActSheet->setCellValue('F1', '网名');
+        $objActSheet->setCellValue('G1', '省');
+        $objActSheet->setCellValue('H1', '市');
+        $objActSheet->setCellValue('U1', '区');
+        $objActSheet->setCellValue('J1', '地址');
+        $objActSheet->setCellValue('K1', '发货条件');
+        $objActSheet->setCellValue('L1', '应收合计');
+        $objActSheet->setCellValue('M1', '邮费');
+        $objActSheet->setCellValue('N1', '优惠金额');
+        $objActSheet->setCellValue('O1', '仓库名称');
+        $objActSheet->setCellValue('P1', '物流公司');
+        $objActSheet->setCellValue('Q1', '商家编码');
+        $objActSheet->setCellValue('R1', '货品数量');
+        $objActSheet->setCellValue('S1', '货品名称');
+        $objActSheet->setCellValue('T1', '货品总价');
+        $objActSheet->setCellValue('U1', '备注');
+        $objActSheet->setCellValue('V1', '订单类别');
 
         $baseRow = 2;
         //默认数据
         $row_num  = count($export_data);
         for ($i = 0; $i < $row_num; $i++) {
             $j = $i + $baseRow;
-            $objExcel->getActiveSheet()->setCellValue('A' . $j, $export_data[$i]['order_number']);
-            $objExcel->getActiveSheet()->setCellValue('B' . $j, $export_data[$i]['receiver']);
-            $objExcel->getActiveSheet()->setCellValue('C' . $j, $export_data[$i]['phone']);
-            $objExcel->getActiveSheet()->setCellValue('D' . $j, $export_data[$i]['address']);
-            $objExcel->getActiveSheet()->setCellValue('E' . $j, $export_data[$i]['count']);
-            $objExcel->getActiveSheet()->setCellValue('F' . $j, $export_data[$i]['remarks']);
-            $objExcel->getActiveSheet()->setCellValue('G' . $j, $export_data[$i]['goods']);
+            $objExcel->getActiveSheet()->setCellValue('B' . $j, $export_data[$i]['order_number']);
+            $objExcel->getActiveSheet()->setCellValue('C' . $j, $export_data[$i]['receiver']);
+            $objExcel->getActiveSheet()->setCellValue('D' . $j, $export_data[$i]['phone']);
+            $objExcel->getActiveSheet()->setCellValue('J' . $j, $export_data[$i]['address']);
+            $objExcel->getActiveSheet()->setCellValue('R' . $j, $export_data[$i]['count']);
+            $objExcel->getActiveSheet()->setCellValue('U' . $j, $export_data[$i]['remarks']);
+            $objExcel->getActiveSheet()->setCellValue('S' . $j, $export_data[$i]['goods']);
         }
 
         $objExcel->setActiveSheetIndex(0);
