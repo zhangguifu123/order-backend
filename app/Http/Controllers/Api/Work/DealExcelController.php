@@ -187,8 +187,8 @@ class DealExcelController extends Controller
                 return msg(3,'文件模版出错！');
         }
 
-        if (!is_array($return_data)) {
-            return msg($return_data, '数据解析失败');
+        if ($return_data['code'] !== 0) {
+            return msg($return_data['code'], $return_data['check']);
         }
         $goods        = array_column($return_data['import_data'],'goods');
         $orderCount = count($return_data['import_data']);
@@ -235,7 +235,7 @@ class DealExcelController extends Controller
         $check    = $sheet->getCell("H2")->getValue();
         $supplier = $this->model->getSupplier($check);
         if (!$supplier){
-            return 13;
+            return ['code' => 16,'check' => $check];
         }
         //生成文件Id
         $fileId  = $this->_createFileId();
@@ -244,7 +244,6 @@ class DealExcelController extends Controller
             $import_data[$i]['file_id']           = $fileId;
             $import_data[$i]['file_name']         = $fileName;
             $import_data[$i]['order_number']      = $sheet->getCell("A" . $i)->getValue();
-            $import_data[$i]['count']             = 1;
             $import_data[$i]['solitaire_number']  = $sheet->getCell("C" . $i)->getValue();
             $import_data[$i]['receiver']          = $sheet->getCell("D" . $i)->getValue();
             $import_data[$i]['phone']             = $sheet->getCell("F" . $i)->getValue();
@@ -258,12 +257,13 @@ class DealExcelController extends Controller
         //检查redis是否存在
         $orderNumbers = array_column($import_data, 'order_number');
         $check  = $this->_checkFile($orderNumbers, $supplier);
-        if (!$check) {
-            return 15;
+        if (is_array($check)) {
+            return ['code' => 15,'check' => $check];
         }
         $this->_cacheFile($fileId, $fileName, $import_data, $supplier);
         Log::notice('fileId:'.$fileId.'fileName'.$fileName);
         $return_result = [
+            'code'        => 0,
             'import_data' => $import_data,
             'fileId'      => $fileId,
         ];
@@ -285,7 +285,7 @@ class DealExcelController extends Controller
         $check    = $sheet->getCell("G2")->getValue();
         $supplier = $this->model->getSupplier($check);
         if (!$supplier){
-            return 13;
+            return ['code' => 16,'check' => $check];
         }
         //生成文件Id
         $fileId  = $this->_createFileId();
@@ -311,12 +311,13 @@ class DealExcelController extends Controller
         //检查redis是否存在
         $orderNumbers = array_column($import_data, 'order_number');
         $check  = $this->_checkFile($orderNumbers, $supplier);
-        if (!$check) {
-            return 15;
+        if (is_array($check)) {
+            return ['code' => 15,'check' => $check];
         }
         $this->_cacheFile($fileId, $fileName, $import_data, $supplier);
         Log::notice('fileId:'.$fileId.'fileName'.$fileName);
         $return_result = [
+            'code'        => 0,
             'import_data' => $import_data,
             'fileId'      => $fileId,
         ];
@@ -338,7 +339,7 @@ class DealExcelController extends Controller
         $check    = $sheet->getCell("G2")->getValue();
         $supplier = $this->model->getSupplier($check);
         if (!$supplier){
-            return 13;
+            return ['code' => 16,'check' => $check];
         }
         //生成文件Id
         $fileId  = $this->_createFileId();
@@ -365,12 +366,13 @@ class DealExcelController extends Controller
         //检查redis是否存在
         $orderNumbers = array_column($import_data, 'order_number');
         $check  = $this->_checkFile($orderNumbers, $supplier);
-        if (!$check) {
-            return 15;
+        if (is_array($check)) {
+            return ['code' => 15,'check' => $check];
         }
         $this->_cacheFile($fileId, $fileName, $import_data, $supplier);
         Log::notice('fileId:'.$fileId.'fileName'.$fileName);
         $return_result = [
+            'code'        => 0,
             'import_data' => $import_data,
             'fileId'      => $fileId,
         ];
@@ -423,9 +425,12 @@ class DealExcelController extends Controller
 
     private function _checkFile($orderNumbers, $supplier) {
         $order_model  = new Order();
-        $check        = $order_model::query()->whereIn('order_number',$orderNumbers)->count();
-        if (!empty($check)) {
-            return false;
+        $check_model  = $order_model::query()->whereIn('order_number',$orderNumbers);
+        $checkCount   = $check_model->count();
+        if (!empty($checkCount)) {
+            $checkMysqlOrder = $check_model->get(['order_number'])->toArray();
+            $check = array_column($checkMysqlOrder, 'order_number');
+            return $check;
         }
         try {
             $redis = new Redis();
@@ -438,7 +443,7 @@ class DealExcelController extends Controller
                 if (empty($check)) {
                     continue;
                 } else {
-                    return false;
+                    return $check;
                 }
             }
             return true;
