@@ -212,7 +212,7 @@ class ExcelService
      */
     private function _exportExcel($objWriter, $supplier = null, $fileName = null){
         header('Content-Type: applicationnd.ms-excel');
-        $time = date('Y-m-d-H-i-s');
+        $time = date('Y-m-d-H:i:s');
         if (!empty($supplier)) {
             $fileName = $supplier . $time . ".xls";
             header("Content-Disposition: attachment;filename=$fileName");
