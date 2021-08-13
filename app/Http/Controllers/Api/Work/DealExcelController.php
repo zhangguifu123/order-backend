@@ -241,6 +241,10 @@ class DealExcelController extends Controller
         $fileId  = $this->_createFileId();
         $import_data = []; //数组形式获取表格数据
         for ($i = 2; $i <= $row_num; $i++) {
+            $check = $sheet->getCell("D" . $i)->getValue();
+            if (empty($check)) {
+                continue;
+            }
             $import_data[$i]['file_id']           = $fileId;
             $import_data[$i]['file_name']         = $fileName;
             $import_data[$i]['order_number']      = $sheet->getCell("A" . $i)->getValue();
@@ -291,6 +295,10 @@ class DealExcelController extends Controller
         $fileId  = $this->_createFileId();
         $import_data = []; //数组形式获取表格数据
         for ($i = 2; $i <= $row_num; $i++) {
+            $check = $sheet->getCell("D" . $i)->getValue();
+            if (empty($check)) {
+                continue;
+            }
             $import_data[$i]['file_id']           = $fileId;
             $import_data[$i]['file_name']         = $fileName;
             $import_data[$i]['order_number']      = $sheet->getCell("C" . $i)->getValue();
@@ -345,6 +353,10 @@ class DealExcelController extends Controller
         $fileId  = $this->_createFileId();
         $import_data = []; //数组形式获取表格数据
         for ($i = 2; $i <= $rowColumn; $i++) {
+            $check = $sheet->getCell("D" . $i)->getValue();
+            if (empty($check)) {
+                continue;
+            }
             $import_data[$i]['file_id']           = $fileId;
             $import_data[$i]['file_name']         = $fileName;
             $import_data[$i]['order_number']      = $sheet->getCell("C" . $i)->getValue();

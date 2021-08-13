@@ -141,6 +141,10 @@ class ExcelService
         $rowColumn = $sheet->getHighestRow();
         $update_data = []; //数组形式获取表格数据
         for ($i = 2; $i <= $rowColumn; $i++) {
+            $check = $sheet->getCell("D" . $i)->getValue();
+            if (empty($check)) {
+                continue;
+            }
             $update_data[$i]['logistics']        = $sheet->getCell("A" . $i)->getValue();
             $update_data[$i]['logistics_number'] = $sheet->getCell("B" . $i)->getValue();
             $update_data[$i]['order_number']     = $sheet->getCell("C" . $i)->getValue();
