@@ -64,46 +64,20 @@ class ExcelService
     private function _buyerExcelExport2($export_data, $objExcel, $objWriter) {
         $objActSheet = $objExcel->getActiveSheet(0);
         $objActSheet->setTitle('团长模版No.2'); //设置excel的标题
-        $objActSheet->setCellValue('D1', '跟团号');
-        $objActSheet->setCellValue('A1', '物流公司（必填）');
-        $objActSheet->setCellValue('B1', '物流单号（必填）');
-        $objActSheet->setCellValue('C1', '订单号（必填）');
-
-        $baseRow = 2;
-        //默认数据
-        $row_num  = count($export_data);
-        for ($i = 0; $i < $row_num; $i++) {
-            $j = $i + $baseRow;
-            $objExcel->getActiveSheet()->setCellValue('A' . $j, $export_data[$i]['solitaire_number']);
-            $objExcel->getActiveSheet()->setCellValue('B' . $j, $export_data[$i]['logistics']);
-            $objExcel->getActiveSheet()->setCellValue('C' . $j, $export_data[$i]['logistics_number']);
-            $objExcel->getActiveSheet()->setCellValue('D' . $j, $export_data[$i]['order_number']);
-        }
-
-        $objExcel->setActiveSheetIndex(0);
-        //4、输出
-        $objExcel->setActiveSheetIndex();
-        $fileName = $export_data[0]['file_name'];
-        return $this->_exportExcel($objWriter, null, $fileName);
-    }
-
-    private function _buyerExcelExport1($export_data, $objExcel, $objWriter) {
-        $objActSheet = $objExcel->getActiveSheet(0);
-        $objActSheet->setTitle('团长模版No.1'); //设置excel的标题
-        $objActSheet->setCellValue('A1', '快递公司(必填)');
-        $objActSheet->setCellValue('B1', '快递单号(必填)');
-        $objActSheet->setCellValue('C1', '订单号(勿删)');
+        $objActSheet->setCellValue('A1', '快递公司（必填）');
+        $objActSheet->setCellValue('B1', '快递单号（必填）');
+        $objActSheet->setCellValue('C1', '订单号（勿删）');
         $objActSheet->setCellValue('D1', '收货人');
-        $objActSheet->setCellValue('F1', '联系电话');
-        $objActSheet->setCellValue('G1', '收获地址');
-        $objActSheet->setCellValue('H1', '商品信息');
-        $objActSheet->setCellValue('I1', '微信昵称');
-        $objActSheet->setCellValue('J1', '接龙号');
-        $objActSheet->setCellValue('K1', '分拣序号');
-        $objActSheet->setCellValue('L1', '下单时间');
-        $objActSheet->setCellValue('M1', '用户备注');
-        $objActSheet->setCellValue('N1', '管理员备注');
-        $objActSheet->setCellValue('O1', '售后状态');
+        $objActSheet->setCellValue('E1', '联系电话');
+        $objActSheet->setCellValue('F1', '收货地址');
+        $objActSheet->setCellValue('G1', '商品信息');
+        $objActSheet->setCellValue('H1', '微信昵称');
+        $objActSheet->setCellValue('I1', '接龙号');
+        $objActSheet->setCellValue('J1', '分拣序号');
+        $objActSheet->setCellValue('K1', '下单时间');
+        $objActSheet->setCellValue('L1', '用户备注');
+        $objActSheet->setCellValue('M1', '管理员备注');
+        $objActSheet->setCellValue('N1', '售后状态');
 
         $baseRow = 2;
         //默认数据
@@ -120,6 +94,35 @@ class ExcelService
             $objExcel->getActiveSheet()->setCellValue('I' . $j, $export_data[$i]['solitaire_number']);
             $objExcel->getActiveSheet()->setCellValue('J' . $j, $export_data[$i]['solitaire_number']);
             $objExcel->getActiveSheet()->setCellValue('M' . $j, $export_data[$i]['remarks']);
+
+
+
+        }
+
+        $objExcel->setActiveSheetIndex(0);
+        //4、输出
+        $objExcel->setActiveSheetIndex();
+        $fileName = $export_data[0]['file_name'];
+        return $this->_exportExcel($objWriter, null, $fileName);
+    }
+
+    private function _buyerExcelExport1($export_data, $objExcel, $objWriter) {
+        $objActSheet = $objExcel->getActiveSheet(0);
+        $objActSheet->setTitle('团长模版No.1'); //设置excel的标题
+        $objActSheet->setCellValue('D1', '跟团号');
+        $objActSheet->setCellValue('A1', '物流公司（必填）');
+        $objActSheet->setCellValue('B1', '物流单号（必填）');
+        $objActSheet->setCellValue('C1', '订单号（必填）');
+
+        $baseRow = 2;
+        //默认数据
+        $row_num  = count($export_data);
+        for ($i = 0; $i < $row_num; $i++) {
+            $j = $i + $baseRow;
+            $objExcel->getActiveSheet()->setCellValue('A' . $j, $export_data[$i]['solitaire_number']);
+            $objExcel->getActiveSheet()->setCellValue('B' . $j, $export_data[$i]['logistics']);
+            $objExcel->getActiveSheet()->setCellValue('C' . $j, $export_data[$i]['logistics_number']);
+            $objExcel->getActiveSheet()->setCellValue('D' . $j, $export_data[$i]['order_number']);
         }
 
         $objExcel->setActiveSheetIndex(0);
